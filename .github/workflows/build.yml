@@ -24,14 +24,18 @@ on:
 
 jobs:
   build:
-    runs-on: windows-11
+    runs-on: windows-latest
     strategy:
       matrix:
-        backend: [vulkan]
+        backend: [vulkan, opengl]
         include:
           - backend: vulkan
             artifact_name: zed-release
             rustflags: ""
+          - backend: opengl
+            artifact_name: zed-release-opengl
+            rustflags: "--cfg gles"
+
     steps:
       - name: Enable long paths in Git
         run: |
@@ -76,10 +80,10 @@ jobs:
 
       - name: Build release
         working-directory: zed
-        run: cargo build
+        run: cargo build --release
 
       - name: Archive build
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: zed/target/debug/zed.exe
+          path: zed/target/release/zed.exe
